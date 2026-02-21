@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tab Voice Translator</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h1>Перевод звука вкладки</h1>
+
+    <div class="row">
+      <label for="apiKey">OpenAI API key</label>
+      <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
+      <div class="hint">Ключ хранится в chrome.storage.sync. Для публикации в сторе нужен бэкенд/эпhemeral-token.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="row">
+        <label for="sourceLang">Язык исходный</label>
+        <select id="sourceLang">
+          <option value="auto">Авто</option>
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="tr">Türkçe</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="targetLang">Язык перевода</label>
+        <select id="targetLang">
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="tr">Türkçe</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="row">
+        <label for="model">Модель</label>
+        <select id="model">
+          <option value="gpt-realtime-mini">gpt-realtime-mini (быстрее)</option>
+          <option value="gpt-realtime">gpt-realtime (лучше качество)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="voice">Голос</label>
+        <select id="voice">
+          <option value="marin">marin</option>
+          <option value="alloy">alloy</option>
+          <option value="ash">ash</option>
+          <option value="ballad">ballad</option>
+          <option value="coral">coral</option>
+          <option value="echo">echo</option>
+          <option value="sage">sage</option>
+          <option value="shimmer">shimmer</option>
+          <option value="verse">verse</option>
+          <option value="cedar">cedar</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="vadMode">VAD / сегментация</label>
+      <select id="vadMode">
+        <option value="server_vad">server_vad (быстро, реагирует на паузы)</option>
+        <option value="semantic_vad">semantic_vad (умнее, но иногда медленнее)</option>
+      </select>
+      <div class="hint">Если перевод замирает на видео с музыкой/шумом — попробуйте semantic_vad или увеличьте threshold.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="row">
+        <label for="vadThreshold">VAD threshold</label>
+        <input id="vadThreshold" type="number" min="0" max="1" step="0.05" />
+      </div>
+      <div class="row">
+        <label for="vadSilenceMs">Silence (ms)</label>
+        <input id="vadSilenceMs" type="number" min="200" max="2000" step="50" />
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="row">
+        <label for="originalVolume">Громкость оригинала</label>
+        <input id="originalVolume" type="range" min="0" max="1" step="0.01" />
+      </div>
+      <div class="row">
+        <label for="translatedVolume">Громкость перевода</label>
+        <input id="translatedVolume" type="range" min="0" max="1" step="0.01" />
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="translationSpeed">Скорость озвучки перевода</label>
+      <input id="translationSpeed" type="number" min="0.8" max="1.5" step="0.05" />
+      <div class="hint">Это пост-обработка аудио. Можно чуть ускорить (например 1.05–1.15), чтобы «догонять» спикера.</div>
+    </div>
+
+    <div class="buttons">
+      <button id="saveBtn" class="secondary">Сохранить</button>
+      <button id="toggleBtn" class="primary">Старт</button>
+    </div>
+
+    <div class="buttons single">
+      <button id="exportLogsBtn" class="secondary">Скачать лог</button>
+    </div>
+
+    <div id="status" class="status">—</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

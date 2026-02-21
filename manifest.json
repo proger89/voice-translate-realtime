@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Voice Translator (Realtime)",
+  "version": "0.1.0",
+  "description": "Captures tab audio, translates it in near real-time, plays voiceover and shows captions.",
+  "permissions": [
+    "tabCapture",
+    "offscreen",
+    "storage",
+    "activeTab",
+    "scripting",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://api.openai.com/*"
+  ],
+  "action": {
+    "default_title": "Tab Voice Translator",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
