@@ -4,13 +4,32 @@
 
 ## Быстрый запуск
 
+Если вы скачиваете проект с GitHub, используйте репозиторий:
+
+`https://github.com/proger89/voice-translate-realtime.git`
+
+```bash
+git clone https://github.com/proger89/voice-translate-realtime.git
+cd voice-translate-realtime
+```
+
+Важно: после `git clone` папка по умолчанию будет называться `voice-translate-realtime`.
+
 1. Откройте `chrome://extensions`.
 2. Включите **Developer mode** (режим разработчика).
-3. Нажмите **Load unpacked** и выберите папку проекта `realtime_tab_translator`.
+3. Нажмите **Load unpacked** и выберите папку проекта (`voice-translate-realtime`, если клонировали из репозитория).
 4. Откройте нужную вкладку с видео/аудио.
 5. Нажмите иконку расширения, введите `OpenAI API key` (`sk-...`) и нажмите **Сохранить**.
 6. Выберите языки перевода, модель и голос.
 7. Нажмите **Старт**.
+
+## Обновление из репозитория
+
+Перед запуском новой версии подтягивайте изменения:
+
+```bash
+git pull
+```
 
 ## Как пользоваться
 
