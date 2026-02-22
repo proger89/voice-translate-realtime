@@ -1,10 +1,10 @@
 # voice-translate-realtime
 
-Расширение Chrome для перевода звука активной вкладки в реальном времени через OpenAI Realtime API.
+Chrome extension for near real-time translation of active tab audio using the OpenAI Realtime API.
 
-## Быстрый запуск
+## Quick start
 
-Если вы скачиваете проект с GitHub, используйте репозиторий:
+Repository:
 
 `https://github.com/proger89/voice-translate-realtime.git`
 
@@ -13,38 +13,40 @@ git clone https://github.com/proger89/voice-translate-realtime.git
 cd voice-translate-realtime
 ```
 
-Важно: после `git clone` папка по умолчанию будет называться `voice-translate-realtime`.
+1. Open `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked** and select the project folder.
+4. Open a tab with video or audio content.
+5. Click the extension icon, enter your `OpenAI API key` (`sk-...`), then click **Save**.
+6. Choose source/target languages, model, and voice.
+7. Click **Start**.
 
-1. Откройте `chrome://extensions`.
-2. Включите **Developer mode** (режим разработчика).
-3. Нажмите **Load unpacked** и выберите папку проекта (`voice-translate-realtime`, если клонировали из репозитория).
-4. Откройте нужную вкладку с видео/аудио.
-5. Нажмите иконку расширения, введите `OpenAI API key` (`sk-...`) и нажмите **Сохранить**.
-6. Выберите языки перевода, модель и голос.
-7. Нажмите **Старт**.
-
-## Обновление из репозитория
-
-Перед запуском новой версии подтягивайте изменения:
+## Updating from Git
 
 ```bash
 git pull
 ```
 
-## Как пользоваться
+## Usage
 
-- Перевод и озвучка идут в реальном времени поверх звука вкладки.
-- Статус подключения и процесса показывается в popup.
-- При необходимости нажмите **Скачать лог** и приложите файл для диагностики.
+- The extension captures active tab audio, translates speech, and plays translated voiceover.
+- Live status and controls are available in the popup.
+- If needed, click **Download log** and share the file for troubleshooting.
 
-## Полезные настройки
+## Useful settings
 
-- `Модель`: `gpt-realtime-mini` быстрее, `gpt-realtime` обычно качественнее.
-- `VAD / сегментация`: если обрывает фразы, попробуйте `semantic_vad`.
-- `VAD threshold` и `Silence (ms)`: влияют на чувствительность к паузам.
-- `Скорость озвучки перевода`: обычно комфортно `1.05–1.15`.
+- `Model`: `gpt-realtime-mini` is faster, `gpt-realtime` is usually higher quality.
+- `VAD / segmentation`: if phrases are cut off or translation stalls, try `semantic_vad`.
+- `VAD threshold` and `Silence (ms)`: tune pause sensitivity.
+- `Translation speech speed`: values around `1.05–1.15` often feel natural and help keep up with the speaker.
 
-## Важно
+## UI language
 
-- Ключ хранится в `chrome.storage.sync`.
-- Для публикации в Chrome Web Store рекомендуется вынести выдачу ephemeral token на собственный бэкенд.
+- The extension supports English and Russian UI.
+- On first install, UI language is auto-selected from browser UI language (`ru*` -> Russian, otherwise English).
+- You can always switch UI language manually in the popup.
+
+## Security note
+
+- API key is stored in `chrome.storage.sync`.
+- For Chrome Web Store production release, it is recommended to issue ephemeral tokens from your own backend instead of exposing a long-lived API key in the extension.

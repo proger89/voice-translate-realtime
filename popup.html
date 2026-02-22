@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,19 +8,27 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Перевод звука вкладки</h1>
+    <h1 data-i18n="title">Tab Audio Translator</h1>
 
     <div class="row">
-      <label for="apiKey">OpenAI API key</label>
-      <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
-      <div class="hint">Ключ хранится в chrome.storage.sync. Для публикации в сторе нужен бэкенд/эпhemeral-token.</div>
+      <label for="uiLang" data-i18n="uiLanguageLabel">UI language</label>
+      <select id="uiLang">
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="apiKey" data-i18n="apiKeyLabel">OpenAI API key</label>
+      <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" data-i18n-placeholder="apiKeyPlaceholder" />
+      <div class="hint" data-i18n="apiKeyHint">Key is stored in chrome.storage.sync. For Chrome Web Store publishing, use a backend with ephemeral tokens.</div>
     </div>
 
     <div class="grid2">
       <div class="row">
-        <label for="sourceLang">Язык исходный</label>
+        <label for="sourceLang" data-i18n="sourceLangLabel">Source language</label>
         <select id="sourceLang">
-          <option value="auto">Авто</option>
+          <option value="auto" data-i18n="sourceLangAuto">Auto</option>
           <option value="en">English</option>
           <option value="ru">Русский</option>
           <option value="de">Deutsch</option>
@@ -32,7 +40,7 @@
         </select>
       </div>
       <div class="row">
-        <label for="targetLang">Язык перевода</label>
+        <label for="targetLang" data-i18n="targetLangLabel">Target language</label>
         <select id="targetLang">
           <option value="ru">Русский</option>
           <option value="en">English</option>
@@ -48,14 +56,14 @@
 
     <div class="grid2">
       <div class="row">
-        <label for="model">Модель</label>
+        <label for="model" data-i18n="modelLabel">Model</label>
         <select id="model">
-          <option value="gpt-realtime-mini">gpt-realtime-mini (быстрее)</option>
-          <option value="gpt-realtime">gpt-realtime (лучше качество)</option>
+          <option value="gpt-realtime-mini" data-i18n="modelMini">gpt-realtime-mini (faster)</option>
+          <option value="gpt-realtime" data-i18n="modelFull">gpt-realtime (better quality)</option>
         </select>
       </div>
       <div class="row">
-        <label for="voice">Голос</label>
+        <label for="voice" data-i18n="voiceLabel">Voice</label>
         <select id="voice">
           <option value="marin">marin</option>
           <option value="alloy">alloy</option>
@@ -72,12 +80,12 @@
     </div>
 
     <div class="row">
-      <label for="vadMode">VAD / сегментация</label>
+      <label for="vadMode" data-i18n="vadModeLabel">VAD / segmentation</label>
       <select id="vadMode">
-        <option value="server_vad">server_vad (быстро, реагирует на паузы)</option>
-        <option value="semantic_vad">semantic_vad (умнее, но иногда медленнее)</option>
+        <option value="server_vad" data-i18n="vadModeServer">server_vad (fast, reacts to pauses)</option>
+        <option value="semantic_vad" data-i18n="vadModeSemantic">semantic_vad (smarter, sometimes slower)</option>
       </select>
-      <div class="hint">Если перевод замирает на видео с музыкой/шумом — попробуйте semantic_vad или увеличьте threshold.</div>
+      <div class="hint" data-i18n="vadHint">If translation stalls on music/noisy video, try semantic_vad or increase threshold.</div>
     </div>
 
     <div class="grid2">
@@ -93,28 +101,28 @@
 
     <div class="grid2">
       <div class="row">
-        <label for="originalVolume">Громкость оригинала</label>
+        <label for="originalVolume" data-i18n="originalVolumeLabel">Original volume</label>
         <input id="originalVolume" type="range" min="0" max="1" step="0.01" />
       </div>
       <div class="row">
-        <label for="translatedVolume">Громкость перевода</label>
+        <label for="translatedVolume" data-i18n="translatedVolumeLabel">Translation volume</label>
         <input id="translatedVolume" type="range" min="0" max="1" step="0.01" />
       </div>
     </div>
 
     <div class="row">
-      <label for="translationSpeed">Скорость озвучки перевода</label>
+      <label for="translationSpeed" data-i18n="translationSpeedLabel">Translation speech speed</label>
       <input id="translationSpeed" type="number" min="0.8" max="1.5" step="0.05" />
-      <div class="hint">Это пост-обработка аудио. Можно чуть ускорить (например 1.05–1.15), чтобы «догонять» спикера.</div>
+      <div class="hint" data-i18n="translationSpeedHint">This is post-processing of translated audio. Slightly increase it (for example, 1.05–1.15) to better keep up with the speaker.</div>
     </div>
 
     <div class="buttons">
-      <button id="saveBtn" class="secondary">Сохранить</button>
-      <button id="toggleBtn" class="primary">Старт</button>
+      <button id="saveBtn" class="secondary" data-i18n="saveBtn">Save</button>
+      <button id="toggleBtn" class="primary" data-i18n="startBtn">Start</button>
     </div>
 
     <div class="buttons single">
-      <button id="exportLogsBtn" class="secondary">Скачать лог</button>
+      <button id="exportLogsBtn" class="secondary" data-i18n="exportLogsBtn">Download log</button>
     </div>
 
     <div id="status" class="status">—</div>

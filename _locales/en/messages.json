@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "Tab Voice Translator (Realtime)",
+    "description": "Extension name shown in Chrome"
+  },
+  "extensionDescription": {
+    "message": "Captures tab audio, translates it in near real-time, plays voiceover and shows captions.",
+    "description": "Extension description shown in Chrome"
+  },
+  "actionTitle": {
+    "message": "Tab Voice Translator",
+    "description": "Toolbar action tooltip"
+  }
+}

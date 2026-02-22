@@ -43,7 +43,7 @@
     }
 
     if (msg.type === 'CAPTION_UPDATE') {
-      setStatus(msg.statusText || 'В работе');
+      setStatus(msg.statusText || 'Working');
       setText(msg.sourceText, msg.targetText);
       return;
     }
@@ -55,5 +55,5 @@
     }
   });
 
-  setStatus('Готово');
+  setStatus('Ready');
 })();

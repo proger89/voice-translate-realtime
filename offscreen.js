@@ -25,6 +25,42 @@ let currentTargetText = '';
 
 const MANUAL_RESPONSE_MODE = false;
 
+const I18N = {
+  en: {
+    listening: 'Listening…',
+    translating: 'Translating…',
+    speaking: 'Speaking…',
+    ready: 'Connected',
+    sessionCreated: 'Session created',
+    realtimeError: 'Realtime error',
+    creatingClientSecret: 'Creating client secret…',
+    connectingWebRTC: 'Connecting WebRTC…',
+    capturingTabAudio: 'Capturing tab audio…',
+    idle: '…'
+  },
+  ru: {
+    listening: 'Слушаю…',
+    translating: 'Перевод…',
+    speaking: 'Говорю…',
+    ready: 'Подключено',
+    sessionCreated: 'Сессия создана',
+    realtimeError: 'Ошибка realtime',
+    creatingClientSecret: 'Создаю client secret…',
+    connectingWebRTC: 'Подключаю WebRTC…',
+    capturingTabAudio: 'Захватываю звук вкладки…',
+    idle: '…'
+  }
+};
+
+function getUiLang() {
+  return settings?.uiLang === 'ru' ? 'ru' : 'en';
+}
+
+function t(key) {
+  const lang = getUiLang();
+  return I18N[lang]?.[key] || I18N.en[key] || key;
+}
+
 let localVadSource = null;
 let localVadAnalyser = null;
 let localVadTimer = null;
@@ -327,7 +363,7 @@ function startLocalVad(stream) {
       if (!localSpeechActive) {
         localSpeechActive = true;
         localSpeechStartTs = now;
-        sendCaptionUpdate({ statusText: 'Слушаю…' });
+          sendCaptionUpdate({ statusText: t('listening') });
       }
       return;
     }
@@ -362,7 +398,7 @@ function stopLocalVad() {
 function resetTranscripts() {
   currentSourceText = '';
   currentTargetText = '';
-  sendCaptionUpdate({ statusText: '…' });
+  sendCaptionUpdate({ statusText: t('idle') });
 }
 
 function scheduleForceCommit() {
@@ -408,7 +444,7 @@ function maybeCreateResponse() {
 
   responseInFlight = true;
   currentTargetText = '';
-  sendCaptionUpdate({ statusText: 'Перевод…' });
+  sendCaptionUpdate({ statusText: t('translating') });
 
   sendEvent({
     type: 'response.create',
@@ -425,18 +461,18 @@ function handleServerEvent(evt) {
 
   switch (evt.type) {
     case 'session.created':
-      sendStatus('session', 'Сессия создана');
+      sendStatus('session', t('sessionCreated'));
       break;
 
     case 'session.updated':
-      sendStatus('ready', 'Подключено');
+      sendStatus('ready', t('ready'));
       break;
 
     case 'input_audio_buffer.speech_started':
       speechActive = true;
       speechStartTs = Date.now();
       // clear target while user is speaking
-      sendCaptionUpdate({ statusText: 'Слушаю…' });
+      sendCaptionUpdate({ statusText: t('listening') });
       break;
 
     case 'input_audio_buffer.speech_stopped':
@@ -454,14 +490,14 @@ function handleServerEvent(evt) {
     case 'conversation.item.input_audio_transcription.delta':
       if (typeof evt.delta === 'string') {
         currentSourceText += evt.delta;
-        sendCaptionUpdate({ statusText: 'Слушаю…' });
+        sendCaptionUpdate({ statusText: t('listening') });
       }
       break;
 
     case 'conversation.item.input_audio_transcription.completed':
       if (typeof evt.transcript === 'string') {
         currentSourceText = evt.transcript;
-        sendCaptionUpdate({ statusText: '…' });
+        sendCaptionUpdate({ statusText: t('idle') });
       }
       break;
 
@@ -470,7 +506,7 @@ function handleServerEvent(evt) {
     case 'response.output_audio_transcript.delta':
       if (typeof evt.delta === 'string') {
         currentTargetText += evt.delta;
-        sendCaptionUpdate({ statusText: 'Говорю…' });
+        sendCaptionUpdate({ statusText: t('speaking') });
       }
       break;
 
@@ -482,13 +518,13 @@ function handleServerEvent(evt) {
       // Fallback if model outputs text modality in the future
       if (typeof evt.delta === 'string') {
         currentTargetText += evt.delta;
-        sendCaptionUpdate({ statusText: 'Говорю…' });
+        sendCaptionUpdate({ statusText: t('speaking') });
       }
       break;
 
     case 'response.done':
       responseInFlight = false;
-      sendCaptionUpdate({ statusText: 'Подключено' });
+      sendCaptionUpdate({ statusText: t('ready') });
       // Create next queued response (if any)
       if (MANUAL_RESPONSE_MODE) {
         maybeCreateResponse();
@@ -505,7 +541,7 @@ function handleServerEvent(evt) {
         sendLog('warn', 'server.error.suppressed', { reason: 'buffer_too_small' });
         break;
       }
-      sendStatus('error', evt.error?.message || 'Ошибка realtime');
+      sendStatus('error', evt.error?.message || t('realtimeError'));
       break;
 
     default:
@@ -523,10 +559,10 @@ async function connectOpenAIRealtime(stream) {
     vadMode: settings?.vadMode || 'server_vad'
   });
 
-  sendStatus('auth', 'Создаю client secret…');
+  sendStatus('auth', t('creatingClientSecret'));
   const clientSecret = await createClientSecret(openaiApiKey);
 
-  sendStatus('webrtc', 'Подключаю WebRTC…');
+  sendStatus('webrtc', t('connectingWebRTC'));
   pc = new RTCPeerConnection();
 
   // Send the tab audio to the model
@@ -557,7 +593,7 @@ async function connectOpenAIRealtime(stream) {
     sendLog('info', 'session.update.sent', {
       reason: 'set_audio_input_turn_detection_interrupt_false'
     });
-    sendStatus('connected', 'Подключено');
+    sendStatus('connected', t('ready'));
     resetTranscripts();
   };
 
@@ -634,7 +670,7 @@ async function start({ tabId: tId, streamId, settings: s }) {
 
   await stop();
 
-  sendStatus('starting', 'Захватываю звук вкладки…');
+  sendStatus('starting', t('capturingTabAudio'));
 
   // Get the tab audio stream using the streamId from tabCapture.getMediaStreamId()
   tabStream = await navigator.mediaDevices.getUserMedia({

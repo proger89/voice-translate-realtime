@@ -2,6 +2,7 @@
 
 const OFFSCREEN_URL = 'offscreen.html';
 const DEFAULT_SETTINGS = {
+  uiLang: 'en',
   provider: 'openai',
   openaiApiKey: '',
   model: 'gpt-realtime-mini',
@@ -18,6 +19,49 @@ const DEFAULT_SETTINGS = {
   originalVolume: 0.0,
   translatedVolume: 1.0
 };
+
+const I18N = {
+  en: {
+    missingApiKey: 'Specify OpenAI API key in extension settings.',
+    noActiveTab: 'Failed to determine active tab.',
+    streamIdError: 'tabCapture did not provide streamId: {error}',
+    starting: 'Starting…',
+    stopped: 'Stopped',
+    offscreenFatal: 'Offscreen error'
+  },
+  ru: {
+    missingApiKey: 'Укажите OpenAI API key в настройках расширения.',
+    noActiveTab: 'Не удалось определить активную вкладку.',
+    streamIdError: 'tabCapture не дал streamId: {error}',
+    starting: 'Запуск…',
+    stopped: 'Остановлено',
+    offscreenFatal: 'Ошибка в offscreen'
+  }
+};
+
+function getUiLang(settings) {
+  return settings?.uiLang === 'ru' ? 'ru' : 'en';
+}
+
+function detectInitialUiLang() {
+  try {
+    const browserLang = (chrome.i18n?.getUILanguage?.() || '').toLowerCase();
+    return browserLang.startsWith('ru') ? 'ru' : 'en';
+  } catch (e) {
+    return 'en';
+  }
+}
+
+function t(settings, key, vars = {}) {
+  const lang = getUiLang(settings);
+  const dict = I18N[lang] || I18N.en;
+  const fallback = I18N.en[key] || key;
+  let text = dict[key] || fallback;
+  for (const [name, value] of Object.entries(vars)) {
+    text = text.replaceAll(`{${name}}`, String(value));
+  }
+  return text;
+}
 
 let creatingOffscreen = null;
 let currentTabId = null;
@@ -181,14 +225,14 @@ async function startOnActiveTab() {
   const settings = await getSettings();
   if (!settings.openaiApiKey) {
     await writeLog('warn', 'background', 'start.blocked.missingApiKey');
-    await setStatus('error', 'Укажите OpenAI API key в настройках расширения.');
+    await setStatus('error', t(settings, 'missingApiKey'));
     return { ok: false, reason: 'missing_api_key' };
   }
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) {
     await writeLog('error', 'background', 'start.failed.noActiveTab');
-    await setStatus('error', 'Не удалось определить активную вкладку.');
+    await setStatus('error', t(settings, 'noActiveTab'));
     return { ok: false, reason: 'no_active_tab' };
   }
 
@@ -207,7 +251,7 @@ async function startOnActiveTab() {
   } catch (e) {
     running = false;
     await writeLog('error', 'background', 'start.streamId.failed', { error: e?.message || String(e) });
-    await setStatus('error', `tabCapture не дал streamId: ${e?.message || e}`);
+    await setStatus('error', t(settings, 'streamIdError', { error: e?.message || e }));
     return { ok: false, reason: 'stream_id_error', error: e?.message || String(e) };
   }
 
@@ -222,13 +266,14 @@ async function startOnActiveTab() {
   await chrome.storage.session.set({ running: true, tabId: currentTabId });
   await chrome.action.setBadgeText({ text: 'ON' });
   await chrome.action.setBadgeBackgroundColor({ color: '#0b7d3a' });
-  await setStatus('starting', 'Запуск…');
+  await setStatus('starting', t(settings, 'starting'));
   await writeLog('info', 'background', 'start.dispatchedToOffscreen', { tabId: currentTabId });
   return { ok: true };
 }
 
 async function stop() {
   await writeLog('info', 'background', 'stop.requested');
+  const settings = await getSettings();
   running = false;
   const { tabId } = await chrome.storage.session.get('tabId');
   const targetTabId = tabId || currentTabId;
@@ -245,7 +290,7 @@ async function stop() {
 
   await chrome.storage.session.set({ running: false, tabId: null });
   await chrome.action.setBadgeText({ text: '' });
-  await setStatus('stopped', 'Остановлено');
+  await setStatus('stopped', t(settings, 'stopped'));
 
   // Optional: keep offscreen alive for fast restart, or close to be tidy.
   // We'll close to reduce resources.
@@ -273,7 +318,20 @@ chrome.runtime.onInstalled.addListener(async () => {
   // Set defaults only if not set
   const { settings } = await chrome.storage.sync.get('settings');
   if (!settings) {
-    await chrome.storage.sync.set({ settings: DEFAULT_SETTINGS });
+    await chrome.storage.sync.set({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        uiLang: detectInitialUiLang()
+      }
+    });
+  } else if (!settings.uiLang) {
+    await chrome.storage.sync.set({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ...settings,
+        uiLang: 'en'
+      }
+    });
   }
   await writeLog('info', 'background', 'extension.installedOrUpdated');
 });
@@ -397,9 +455,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'OFFSCREEN_FATAL') {
     (async () => {
       try {
-        await writeLog('error', 'background', 'offscreen.fatal', { message: msg.message || 'Ошибка в offscreen' });
+        const settings = await getSettings();
+        await writeLog('error', 'background', 'offscreen.fatal', { message: msg.message || t(settings, 'offscreenFatal') });
         running = false;
-        await setStatus('error', msg.message || 'Ошибка в offscreen');
+        await setStatus('error', msg.message || t(settings, 'offscreenFatal'));
         try {
           const exported = await exportLogsToFile('fatal', false);
           await writeLog('info', 'background', 'logs.exported.fatal', exported);

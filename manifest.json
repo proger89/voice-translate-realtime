@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Tab Voice Translator (Realtime)",
+  "name": "__MSG_extensionName__",
   "version": "0.1.0",
-  "description": "Captures tab audio, translates it in near real-time, plays voiceover and shows captions.",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "permissions": [
     "tabCapture",
     "offscreen",
@@ -15,7 +16,7 @@
     "https://api.openai.com/*"
   ],
   "action": {
-    "default_title": "Tab Voice Translator",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html"
   },
   "background": {
